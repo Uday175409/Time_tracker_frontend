@@ -50,6 +50,7 @@ export default function Home() {
   const [description, setDescription] = useState('');
   const [history, setHistory] = useState<DailyHistory[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<'today' | '7days' | '10days' | '30days'>('7days');
 
   const handleLogin = async () => {
     if (!loginName || !loginPassword) {
@@ -100,8 +101,15 @@ export default function Home() {
   const fetchHistory = async () => {
     if (!user) return;
     
+    const daysMap = {
+      'today': 1,
+      '7days': 7,
+      '10days': 10,
+      '30days': 30
+    };
+    
     try {
-      const response = await fetch(`${API_URL}/api/track/history?userId=${user.id}&days=30`);
+      const response = await fetch(`${API_URL}/api/track/history?userId=${user.id}&days=${daysMap[historyFilter]}`);
       const data = await response.json();
       if (data.success) {
         setHistory(data.history);
@@ -136,7 +144,7 @@ export default function Home() {
     fetchHistory();
     const interval = setInterval(fetchTodayData, 5000);
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, historyFilter]);
 
   useEffect(() => {
     if (todayData.runningEntry) {
@@ -407,7 +415,39 @@ export default function Home() {
             {showHistory && (
               <Card>
                 <CardHeader>
-                  <CardTitle>History (Last 30 Days)</CardTitle>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <CardTitle>History</CardTitle>
+                    <div className="flex gap-2 flex-wrap">
+                      <Button
+                        size="sm"
+                        variant={historyFilter === 'today' ? 'default' : 'outline'}
+                        onClick={() => setHistoryFilter('today')}
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={historyFilter === '7days' ? 'default' : 'outline'}
+                        onClick={() => setHistoryFilter('7days')}
+                      >
+                        7 Days
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={historyFilter === '10days' ? 'default' : 'outline'}
+                        onClick={() => setHistoryFilter('10days')}
+                      >
+                        10 Days
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={historyFilter === '30days' ? 'default' : 'outline'}
+                        onClick={() => setHistoryFilter('30days')}
+                      >
+                        30 Days
+                      </Button>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {history.length === 0 ? (
