@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-const CATEGORIES = ['Python', 'SQL', 'Datasetu', 'Break', 'TT'];
+const CATEGORIES = ['Python', 'SQL', 'Midas','Datasetu', 'Break', 'TT'];
 
 interface RunningEntry {
   _id: string;
@@ -160,10 +160,14 @@ export default function Home() {
   }, [todayData.runningEntry]);
 
   const handleCategoryClick = (category: string) => {
-    // Show description modal for all categories
-    setSelectedCategory(category);
-    setDescription('');
-    setShowDescriptionModal(true);
+    // Skip description modal for TT and Break
+    if (category === 'TT' || category === 'Break') {
+      handleStartCategory(category, '');
+    } else {
+      setSelectedCategory(category);
+      setDescription('');
+      setShowDescriptionModal(true);
+    }
   };
 
   const handleStartCategory = async (category: string, desc: string) => {
