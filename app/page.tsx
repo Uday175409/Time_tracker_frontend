@@ -175,6 +175,16 @@ export default function Home() {
     
     setLoading(true);
     try {
+      // Stop current running entry if exists
+      if (todayData.runningEntry) {
+        await fetch(`${API_URL}/api/track/stop`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id }),
+        });
+      }
+
+      // Start new entry
       const response = await fetch(`${API_URL}/api/track/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
