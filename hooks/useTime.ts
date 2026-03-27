@@ -47,7 +47,8 @@ export function useToday(userId: string | undefined) {
         queryKey: ['today', userId],
         queryFn: () => fetchToday(userId!),
         enabled: !!userId,
-        refetchInterval: 5000, // Poll every 5 seconds
+        staleTime: 15000,
+        refetchInterval: 15000,
     });
 }
 

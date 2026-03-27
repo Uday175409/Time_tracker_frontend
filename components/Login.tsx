@@ -13,13 +13,20 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 export function Login({ onLogin }: LoginProps) {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async () => {
+        if (!name.trim() || !password.trim()) {
+            alert('Please enter both name and password');
+            return;
+        }
+
         try {
+            setLoading(true);
             const res = await fetch(`${API_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, password }),
+                body: JSON.stringify({ name: name.trim(), password }),
             });
             const data = await res.json();
             if (data.success) {
@@ -29,6 +36,8 @@ export function Login({ onLogin }: LoginProps) {
             }
         } catch (e) {
             alert('Login error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -43,6 +52,11 @@ export function Login({ onLogin }: LoginProps) {
                     placeholder="Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !loading) {
+                            void handleLogin();
+                        }
+                    }}
                 />
                 <input
                     className="w-full p-2 border rounded bg-background"
@@ -50,9 +64,14 @@ export function Login({ onLogin }: LoginProps) {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !loading) {
+                            void handleLogin();
+                        }
+                    }}
                 />
-                <Button onClick={handleLogin} className="w-full">
-                    Login
+                <Button onClick={handleLogin} className="w-full" disabled={loading || !name.trim() || !password.trim()}>
+                    {loading ? 'Signing in...' : 'Login'}
                 </Button>
             </CardContent>
         </Card>
