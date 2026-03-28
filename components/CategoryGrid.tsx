@@ -83,24 +83,25 @@ export function CategoryGrid({ userId, onStart, activeCategory, isLoading }: Cat
     }
 
     return (
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle>Start Tracking</CardTitle>
-                <div className="flex gap-1">
+        <Card className="bg-white/[0.02] backdrop-blur-xl border border-white/10 shadow-2xl transition-all">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-white/5 mb-4">
+                <CardTitle className="text-gray-200 font-semibold tracking-wide">Start Tracking</CardTitle>
+                <div className="flex gap-2">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setEditMode(!editMode)}
-                        className={cn("text-xs", editMode && "text-red-400")}
+                        className={cn("text-xs font-medium bg-white/5 hover:bg-white/10 rounded-lg transition-colors", editMode && "text-red-400 bg-red-500/10 hover:bg-red-500/20")}
                     >
-                        {editMode ? 'Done' : 'Edit'}
+                        {editMode ? 'Done' : 'Edit Categories'}
                     </Button>
                     <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
                         onClick={() => setShowAdd(!showAdd)}
+                        className="bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
                     >
-                        <Plus size={14} />
+                        <Plus size={16} className="text-gray-300" />
                     </Button>
                 </div>
             </CardHeader>
@@ -172,23 +173,23 @@ export function CategoryGrid({ userId, onStart, activeCategory, isLoading }: Cat
                         <button
                             onClick={() => setFilterTag(null)}
                             className={cn(
-                                'text-[11px] px-2 py-0.5 rounded-full border transition-colors',
+                                'text-xs px-3 py-1 rounded-full border transition-all font-medium',
                                 filterTag === null
-                                    ? 'border-blue-500 text-blue-400 bg-blue-500/10'
-                                    : 'border-gray-700 text-gray-500 hover:border-gray-600'
+                                    ? 'border-blue-500/50 text-blue-400 bg-blue-500/20 shadow-md shadow-blue-500/10'
+                                    : 'border-white/10 text-gray-400 bg-white/5 hover:bg-white/10 hover:text-gray-200'
                             )}
                         >
-                            All
+                            All Tasks
                         </button>
                         {Array.from(new Set(categories.map(c => c.tag).filter(Boolean))).map(tag => (
                             <button
                                 key={tag}
                                 onClick={() => setFilterTag(tag === filterTag ? null : tag)}
                                 className={cn(
-                                    'text-[11px] px-2 py-0.5 rounded-full border transition-colors',
+                                    'text-xs px-3 py-1 rounded-full border transition-all font-medium',
                                     filterTag === tag
-                                        ? 'border-blue-500 text-blue-400 bg-blue-500/10'
-                                        : 'border-gray-700 text-gray-500 hover:border-gray-600'
+                                        ? 'border-blue-500/50 text-blue-400 bg-blue-500/20 shadow-md shadow-blue-500/10'
+                                        : 'border-white/10 text-gray-400 bg-white/5 hover:bg-white/10 hover:text-gray-200'
                                 )}
                             >
                                 {tag}
@@ -200,25 +201,28 @@ export function CategoryGrid({ userId, onStart, activeCategory, isLoading }: Cat
                 {/* Category grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {categories?.filter(cat => !filterTag || cat.tag === filterTag).map((cat) => (
-                        <div key={cat._id} className="relative group">
+                        <div key={cat._id} className="relative group perspective-1000">
                             <Button
-                                variant={activeCategory === cat.name ? 'default' : 'outline'}
+                                variant="outline"
                                 className={cn(
-                                    "h-24 w-full text-lg font-semibold transition-all hover:scale-105 flex flex-col gap-0.5",
+                                    "h-28 w-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col gap-1.5 border relative overflow-hidden",
                                     activeCategory === cat.name
-                                        ? "ring-2 ring-primary ring-offset-2"
-                                        : colorMap[cat.color] || colorMap.blue
+                                        ? "bg-blue-500/20 border-blue-400/50 shadow-blue-500/20"
+                                        : "bg-white/5 border-white/5 shadow-black/50 hover:bg-white/10 hover:border-white/20"
                                 )}
                                 onClick={() => !editMode && onStart(cat.name)}
                                 disabled={isLoading}
                             >
-                                {cat.name}
-                                {cat.tag && (
-                                    <span className="block text-[9px] font-normal opacity-50">{cat.tag}</span>
-                                )}
-                                {!cat.isProductive && (
-                                    <span className="block text-[10px] font-normal opacity-60">break</span>
-                                )}
+                                {/* Subtle animated shine effect */}
+                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                                
+                                <div className={cn("w-3 h-3 rounded-full shadow-sm", colorDots[cat.color] || colorDots.blue)}></div>
+                                <span className={cn("text-base font-bold tracking-tight", activeCategory === cat.name ? "text-blue-100" : "text-gray-200")}>{cat.name}</span>
+                                
+                                <div className="flex gap-2 items-center text-[10px] font-medium opacity-60 uppercase tracking-wider">
+                                    {cat.tag && <span>{cat.tag}</span>}
+                                    {!cat.isProductive && <span className="text-red-300 bg-red-900/40 px-1 rounded">BREAK</span>}
+                                </div>
                             </Button>
                             {/* Delete button — visible in edit mode */}
                             {editMode && (

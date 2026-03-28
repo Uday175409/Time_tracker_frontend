@@ -1,28 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export function useIdle(timeoutSeconds: number = 300) {
     const [isIdle, setIsIdle] = useState(false);
+    const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
-
-        const handleActivity = () => {
-            setIsIdle(false);
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => setIsIdle(true), timeoutSeconds * 1000);
+        const resetTimeout = () => {
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+            }
+            timeoutIdRef.current = setTimeout(() => {
+                setIsIdle(true);
+            }, timeoutSeconds * 1000);
         };
 
-        // Events to track
-        const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+        const handleActivity = () => {
+            setIsIdle((prev) => {
+                if (prev) return false;
+                return prev;
+            });
+            resetTimeout();
+        };
 
-        events.forEach(event => window.addEventListener(event, handleActivity));
+        // Events to track. Removed mousemove and scroll to avoid extreme performance degradation.
+        const events = ['mousedown', 'keydown', 'touchstart', 'click'];
+
+        events.forEach(event => window.addEventListener(event, handleActivity, { passive: true }));
 
         // Initial start
-        timeoutId = setTimeout(() => setIsIdle(true), timeoutSeconds * 1000);
+        resetTimeout();
 
         return () => {
             events.forEach(event => window.removeEventListener(event, handleActivity));
-            clearTimeout(timeoutId);
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+            }
         };
     }, [timeoutSeconds]);
 

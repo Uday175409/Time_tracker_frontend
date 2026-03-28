@@ -38,24 +38,29 @@ export default function EODPage() {
   const isToday = date === new Date().toISOString().split('T')[0];
 
   return (
-    <main className="min-h-screen p-4 md:p-8 bg-black text-gray-100 dark">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <main className="min-h-screen p-4 md:p-8 bg-[#020617] text-gray-100 dark relative overflow-hidden font-sans">
+      {/* Animated Background Blobs */}
+      <div className="fixed w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] -top-32 -left-32 animate-blob mix-blend-screen pointer-events-none"></div>
+      <div className="fixed w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px] top-1/4 right-0 animate-blob animation-delay-2000 mix-blend-screen pointer-events-none"></div>
+      <div className="fixed w-[700px] h-[700px] bg-emerald-600/10 rounded-full blur-[100px] -bottom-32 left-1/4 animate-blob animation-delay-4000 mix-blend-screen pointer-events-none"></div>
+
+      <div className="max-w-6xl mx-auto space-y-8 relative z-10 animate-fade-in-up">
         {/* Header */}
-        <header className="flex items-center gap-4">
+        <header className="flex items-center gap-4 pb-6 border-b border-white/10">
           <Link href="/">
-            <Button variant="ghost"><ArrowLeft size={18} /></Button>
+            <Button variant="ghost" size="sm" className="hover:bg-white/10 transition-all rounded-xl"><ArrowLeft size={18} /></Button>
           </Link>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
+            <h1 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
               End-of-Day Report
             </h1>
-            <p className="text-sm text-gray-500">{user.name}</p>
+            <p className="text-sm text-gray-400 mt-1">{user.name}</p>
           </div>
         </header>
 
         {/* Date navigator */}
-        <div className="flex items-center justify-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => changeDate(-1)}>
+        <div className="flex items-center justify-center gap-4 py-2">
+          <Button variant="ghost" size="icon" onClick={() => changeDate(-1)} className="hover:bg-white/10 rounded-full transition-colors">
             <ChevronLeft size={18} />
           </Button>
           <div className="text-center">

@@ -71,77 +71,82 @@ function Dashboard({ user, onLogout }: { user: { id: string; name: string }, onL
     startMutation.mutate({ userId: user.id, category, description: desc || '' });
   };
 
-  return (
-    <main className="min-h-screen p-4 md:p-8 bg-black text-gray-100 dark">
-      <div className="max-w-5xl mx-auto space-y-8">
-        <header className="flex justify-between items-center pb-6 border-b border-gray-800">
-          <div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
-              Flow State
-            </h1>
-            <p className="text-gray-400">Welcome back, {user.name}</p>
-          </div>
-          <div className="flex gap-2">
-            <Link href="/eod">
-              <Button variant="outline" className="gap-2">
-                <FileText size={16} /> EOD
+    return (
+      <main className="min-h-screen p-4 md:p-8 bg-[#020617] text-gray-100 dark relative overflow-hidden font-sans">
+        {/* Animated Background Blobs */}
+        <div className="fixed w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] -top-32 -left-32 animate-blob mix-blend-screen pointer-events-none"></div>
+        <div className="fixed w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px] top-1/4 right-0 animate-blob animation-delay-2000 mix-blend-screen pointer-events-none"></div>
+        <div className="fixed w-[700px] h-[700px] bg-emerald-600/10 rounded-full blur-[100px] -bottom-32 left-1/4 animate-blob animation-delay-4000 mix-blend-screen pointer-events-none"></div>
+
+        <div className="max-w-6xl mx-auto space-y-8 relative z-10 animate-fade-in-up">
+          <header className="flex justify-between items-center pb-6 border-b border-white/10">
+            <div>
+              <h1 className="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400">
+                Flow State
+              </h1>
+              <p className="text-gray-400 mt-1">Welcome back, <span className="text-gray-200 font-medium">{user.name}</span></p>
+            </div>
+            <div className="flex gap-3">
+              <Link href="/eod">
+                <Button variant="outline" className="gap-2 bg-white/5 border-white/10 hover:bg-white/10 transition-all rounded-xl">
+                  <FileText size={16} /> EOD
+                </Button>
+              </Link>
+              <Link href="/analytics">
+                <Button variant="outline" className="gap-2 bg-white/5 border-white/10 hover:bg-white/10 transition-all rounded-xl">
+                  <BarChart3 size={16} /> Analytics
+                </Button>
+              </Link>
+              <Button variant="ghost" onClick={onLogout} className="text-gray-400 hover:text-white hover:bg-red-500/20 transition-colors rounded-xl">
+                <LogOut size={18} />
               </Button>
-            </Link>
-            <Link href="/analytics">
-              <Button variant="outline" className="gap-2">
-                <BarChart3 size={16} /> Analytics
-              </Button>
-            </Link>
-            <Button variant="ghost" onClick={onLogout}>
-              <LogOut size={16} />
-            </Button>
-          </div>
-        </header>
-
-        <section className="grid gap-8 md:grid-cols-2">
-          <div className="space-y-8">
-            <Timer
-              runningEntry={today?.runningEntry || null}
-              onStop={() => {
-                if (pomodoroActive) {
-                  alert('A Pomodoro is currently active. Cancel or finish it first.');
-                  return;
-                }
-                stopMutation.mutate(user.id);
-              }}
-              isLoading={stopMutation.isPending}
-            />
-            <CategoryGrid
-              userId={user.id}
-              onStart={handleStart}
-              activeCategory={today?.runningEntry?.category}
-              isLoading={startMutation.isPending || pomodoroActive}
-            />
-
-            {/* Pomodoro Timer */}
-            <PomodoroTimer
-              userId={user.id}
-              activeCategory={today?.runningEntry?.category}
-              onStartWork={handleStart}
-              onPhaseChange={handlePomodoroPhaseChange}
-            />
-
-            {/* Session-linked notes — only visible when a timer is running */}
-            {today?.runningEntry && (
-              <SessionNotes
-                userId={user.id}
-                sessionId={today.runningEntry._id}
-                category={today.runningEntry.category}
+            </div>
+          </header>
+  
+          <section className="grid gap-8 md:grid-cols-[1.2fr_1fr]">
+            <div className="space-y-8">
+              <Timer
+                runningEntry={today?.runningEntry || null}
+                onStop={() => {
+                  if (pomodoroActive) {
+                    alert('A Pomodoro is currently active. Cancel or finish it first.');
+                    return;
+                  }
+                  stopMutation.mutate(user.id);
+                }}
+                isLoading={stopMutation.isPending}
               />
-            )}
-          </div>
-
-          <div className="space-y-8">
-            {/* Daily Summary */}
-            <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-              <h3 className="text-xl font-semibold mb-4 text-gray-200">Today&apos;s Focus</h3>
-              {/* Total hours worked badge */}
-              {today?.totals && Object.keys(today.totals).length > 0 && (
+              <CategoryGrid
+                userId={user.id}
+                onStart={handleStart}
+                activeCategory={today?.runningEntry?.category}
+                isLoading={startMutation.isPending || pomodoroActive}
+              />
+  
+              {/* Pomodoro Timer */}
+              <PomodoroTimer
+                userId={user.id}
+                activeCategory={today?.runningEntry?.category}
+                onStartWork={handleStart}
+                onPhaseChange={handlePomodoroPhaseChange}
+              />
+  
+              {/* Session-linked notes — only visible when a timer is running */}
+              {today?.runningEntry && (
+                <SessionNotes
+                  userId={user.id}
+                  sessionId={today.runningEntry._id}
+                  category={today.runningEntry.category}
+                />
+              )}
+            </div>
+  
+            <div className="space-y-8">
+              {/* Daily Summary */}
+              <div className="bg-white/[0.02] backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-2xl">
+                <h3 className="text-lg font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-gray-100 to-gray-400">Today&apos;s Focus</h3>
+                {/* Total hours worked badge */}
+                {today?.totals && Object.keys(today.totals).length > 0 && (
                 <div className="flex items-center gap-2 mb-4 p-2 rounded-md bg-gray-800/50 border border-gray-700/40">
                   <Clock size={16} className="text-green-400" />
                   <span className="text-sm text-gray-400">Total worked:</span>

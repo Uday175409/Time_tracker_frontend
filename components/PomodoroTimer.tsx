@@ -644,7 +644,7 @@ export function PomodoroTimer({ userId, activeCategory, onStartWork, onPhaseChan
   const progress = totalSeconds > 0 ? (totalSeconds - secondsLeft) / totalSeconds : 0;
 
   return (
-    <Card className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-gray-700 relative overflow-hidden">
+    <Card className="bg-white/[0.02] backdrop-blur-xl border border-white/10 shadow-2xl relative overflow-hidden transition-all">
       {/* ── Toast notification ── */}
       {toast && (
         <div
