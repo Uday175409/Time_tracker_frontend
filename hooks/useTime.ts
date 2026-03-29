@@ -47,8 +47,12 @@ export function useToday(userId: string | undefined) {
         queryKey: ['today', userId],
         queryFn: () => fetchToday(userId!),
         enabled: !!userId,
-        staleTime: 15000,
-        refetchInterval: 15000,
+        staleTime: 5000,
+        refetchInterval: (query) => {
+            const data = query.state.data as TodayData | undefined;
+            return data?.runningEntry ? 5000 : 30000;
+        },
+        refetchIntervalInBackground: false,
     });
 }
 

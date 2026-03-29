@@ -14,6 +14,8 @@ export function useAnalytics(userId: string | undefined, range: 'day' | 'week' |
         queryKey: ['analytics', userId, range],
         queryFn: () => fetchAnalytics(userId!, range),
         enabled: !!userId,
+        staleTime: 60_000,
+        refetchOnMount: false,
     });
 }
 
@@ -39,6 +41,8 @@ export function useTrend(userId: string | undefined, days: number = 30) {
         queryKey: ['trend', userId, days],
         queryFn: () => fetchTrend(userId!, days),
         enabled: !!userId,
+        staleTime: 60_000,
+        refetchOnMount: false,
     });
 }
 
@@ -62,6 +66,8 @@ export function useWeeklyCategories(userId: string | undefined, weeks: number = 
         queryKey: ['weeklyCategories', userId, weeks],
         queryFn: () => fetchWeeklyCategories(userId!, weeks),
         enabled: !!userId,
+        staleTime: 60_000,
+        refetchOnMount: false,
     });
 }
 
@@ -84,6 +90,8 @@ export function useHeatmap(userId: string | undefined, days: number = 365) {
         queryKey: ['heatmap', userId, days],
         queryFn: () => fetchHeatmap(userId!, days),
         enabled: !!userId,
+        staleTime: 5 * 60_000,
+        refetchOnMount: false,
     });
 }
 
@@ -112,5 +120,7 @@ export function useInsights(userId: string | undefined) {
         queryKey: ['insights', userId],
         queryFn: () => fetchInsights(userId!),
         enabled: !!userId,
+        staleTime: 60_000,
+        refetchOnMount: false,
     });
 }

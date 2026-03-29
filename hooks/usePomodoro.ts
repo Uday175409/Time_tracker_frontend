@@ -107,11 +107,12 @@ export function usePomodoroToday(userId: string | undefined) {
     queryKey: ['pomodoro', userId],
     queryFn: () => fetchPomodoroToday(userId!),
     enabled: !!userId,
-    staleTime: 10000,
+    staleTime: 5000,
     refetchInterval: (query) => {
       const phase = (query.state.data as PomodoroSession | undefined)?.activePhase;
-      return phase && phase !== 'idle' ? 5000 : 30000;
+      return phase && phase !== 'idle' ? 4000 : 45000;
     },
+    refetchIntervalInBackground: false,
   });
 }
 

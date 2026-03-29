@@ -14,5 +14,7 @@ export function useHistory(userId: string | undefined, days: number = 7) {
         queryKey: ['history', userId, days],
         queryFn: () => fetchHistory(userId!, days),
         enabled: !!userId,
+        staleTime: 60_000,
+        refetchOnMount: false,
     });
 }
