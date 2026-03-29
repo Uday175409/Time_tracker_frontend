@@ -177,10 +177,10 @@ function CustomModeForm({
           </label>
           <input
             type="number"
-            min={1}
+            min={0}
             max={60}
             value={breakMin}
-            onChange={(e) => setBreakMin(Math.max(1, Math.min(60, Number(e.target.value))))}
+            onChange={(e) => setBreakMin(Math.max(0, Math.min(60, Number(e.target.value))))}
             className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-1.5 text-sm text-white focus:border-green-500 focus:outline-none"
           />
         </div>
@@ -406,23 +406,32 @@ export function PomodoroTimer({ userId, activeCategory, onStartWork, onPhaseChan
         { userId, category: workCategory },
         {
           onSuccess: () => {
-            // Transition to break phase
+            // Transition to break phase if duration > 0
             const breakDuration = cfg.break;
-            setPhase('break');
-            setSecondsLeft(breakDuration);
-            setTotalSeconds(breakDuration);
-            showToast(`☕ Work complete! Take a ${Math.floor(breakDuration / 60)} min break`, 'break');
-            if (notificationsEnabled) {
-              notifyPomodoroComplete(workCategory, Math.floor(breakDuration / 60));
+            if (breakDuration > 0) {
+              setPhase('break');
+              setSecondsLeft(breakDuration);
+              setTotalSeconds(breakDuration);
+              showToast(`☕ Work complete! Take a ${Math.floor(breakDuration / 60)} min break`, 'break');
+              if (notificationsEnabled) {
+                notifyPomodoroComplete(workCategory, Math.floor(breakDuration / 60));
+              }
+              saveTimerState({
+                phase: 'break',
+                startedAt: Date.now(),
+                category: workCategory,
+                totalDuration: breakDuration,
+                pausedAt: null,
+                totalPausedMs: 0,
+              });
+            } else {
+              setPhase('idle');
+              setSecondsLeft(0);
+              setTotalSeconds(0);
+              hasStartedRef.current = false;
+              clearTimerState();
+              showToast(`☕ Work complete!`, 'break');
             }
-            saveTimerState({
-              phase: 'break',
-              startedAt: Date.now(),
-              category: workCategory,
-              totalDuration: breakDuration,
-              pausedAt: null,
-              totalPausedMs: 0,
-            });
           },
         }
       );
@@ -507,6 +516,18 @@ export function PomodoroTimer({ userId, activeCategory, onStartWork, onPhaseChan
       const breakDuration = (prevSaved?.breakRemaining != null && prevSaved.breakRemaining > 0)
         ? prevSaved.breakRemaining
         : cfg.break;
+
+      if (breakDuration === 0) {
+        pauseMut.mutate(userId);
+        setPaused(true);
+        const saved = loadTimerState();
+        if (saved) {
+          saved.pausedAt = Date.now();
+          saveTimerState(saved);
+        }
+        return;
+      }
+
       const breakTotal = (prevSaved?.breakTotal != null && prevSaved.breakTotal > 0)
         ? prevSaved.breakTotal
         : cfg.break;
