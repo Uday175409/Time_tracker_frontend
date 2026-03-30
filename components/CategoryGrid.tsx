@@ -10,7 +10,7 @@ import { Plus, X, Trash2, Tag } from 'lucide-react';
 const AVAILABLE_TAGS = [
     'Development', 'Meetings', 'Bug Fixes', 'Code Review',
     'Research', 'Documentation', 'Testing', 'DevOps',
-    'Design', 'Learning', 'Break', 'Other',
+    'Design', 'Learning', 'Other',
 ];
 
 // Map color keys to Tailwind classes for category buttons
