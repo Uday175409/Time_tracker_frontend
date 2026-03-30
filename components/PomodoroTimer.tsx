@@ -152,11 +152,24 @@ function CustomModeForm({
   const [workMin, setWorkMin] = useState(initialWork);
   const [breakMin, setBreakMin] = useState(initialBreak);
 
+  const parseWorkMinutes = (raw: string) => {
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return 1;
+    return Math.max(1, Math.min(180, Math.floor(n)));
+  };
+
+  const parseBreakMinutes = (raw: string) => {
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return 0;
+    return Math.max(0, Math.min(60, Math.floor(n)));
+  };
+
   return (
     <div className="bg-gray-800/60 rounded-lg p-4 space-y-3 border border-gray-700">
       <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
         Custom Timer
       </p>
+      <p className="text-[11px] text-gray-500">Set Break to 0 for back-to-back focus sessions.</p>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="text-[11px] text-gray-500 block mb-1">
@@ -167,7 +180,7 @@ function CustomModeForm({
             min={1}
             max={180}
             value={workMin}
-            onChange={(e) => setWorkMin(Math.max(1, Math.min(180, Number(e.target.value))))}
+            onChange={(e) => setWorkMin(parseWorkMinutes(e.target.value))}
             className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-1.5 text-sm text-white focus:border-blue-500 focus:outline-none"
           />
         </div>
@@ -179,10 +192,19 @@ function CustomModeForm({
             type="number"
             min={0}
             max={60}
+            step={1}
+            inputMode="numeric"
             value={breakMin}
-            onChange={(e) => setBreakMin(Math.max(0, Math.min(60, Number(e.target.value))))}
+            onChange={(e) => setBreakMin(parseBreakMinutes(e.target.value))}
             className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-1.5 text-sm text-white focus:border-green-500 focus:outline-none"
           />
+          <button
+            type="button"
+            onClick={() => setBreakMin(0)}
+            className="mt-1 text-[10px] text-green-400 hover:text-green-300"
+          >
+            No break (0 min)
+          </button>
         </div>
       </div>
       <div className="flex gap-2 justify-end">
@@ -653,11 +675,13 @@ export function PomodoroTimer({ userId, activeCategory, onStartWork, onPhaseChan
 
   // ── Save custom mode ──
   const saveCustomMode = (work: number, brk: number) => {
+    const safeWork = Math.max(1, Math.min(180, Math.floor(work)));
+    const safeBreak = Math.max(0, Math.min(60, Math.floor(brk)));
     setModeMut.mutate({
       userId,
       mode: 'custom',
-      customWorkMinutes: work,
-      customBreakMinutes: brk,
+      customWorkMinutes: safeWork,
+      customBreakMinutes: safeBreak,
     });
     setShowCustomForm(false);
   };
@@ -727,6 +751,25 @@ export function PomodoroTimer({ userId, activeCategory, onStartWork, onPhaseChan
                     {m === '25/5' ? '25 / 5' : '50 / 10'}
                   </button>
                 ))}
+                <button
+                  onClick={() => {
+                    if (phase !== 'idle') return;
+                    setModeMut.mutate({
+                      userId,
+                      mode: 'custom',
+                      customWorkMinutes: customWork,
+                      customBreakMinutes: 0,
+                    });
+                    setShowCustomForm(false);
+                  }}
+                  className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                    mode === 'custom' && customBreak === 0
+                      ? 'border-green-500 text-green-400 bg-green-500/10'
+                      : 'border-gray-700 text-gray-500 hover:border-gray-600 hover:text-gray-400'
+                  }`}
+                >
+                  No Break
+                </button>
                 <button
                   onClick={() => setShowCustomForm((v) => !v)}
                   className={`text-xs px-3 py-1 rounded-full border transition-colors flex items-center gap-1 ${

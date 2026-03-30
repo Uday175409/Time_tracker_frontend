@@ -191,6 +191,33 @@ export function useSetPomodoroMode() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: setMode,
+    onMutate: async (variables) => {
+      const key = ['pomodoro', variables.userId] as const;
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData<PomodoroSession>(key);
+
+      if (previous) {
+        qc.setQueryData<PomodoroSession>(key, {
+          ...previous,
+          mode: variables.mode,
+          customWorkMinutes:
+            variables.mode === 'custom'
+              ? (variables.customWorkMinutes ?? previous.customWorkMinutes ?? 25)
+              : previous.customWorkMinutes,
+          customBreakMinutes:
+            variables.mode === 'custom'
+              ? (variables.customBreakMinutes ?? previous.customBreakMinutes ?? 5)
+              : previous.customBreakMinutes,
+        });
+      }
+
+      return { previous, key };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) {
+        qc.setQueryData(context.key, context.previous);
+      }
+    },
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: ['pomodoro', variables.userId] });
     },
