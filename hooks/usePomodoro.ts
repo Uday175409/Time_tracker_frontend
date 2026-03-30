@@ -202,11 +202,11 @@ export function useSetPomodoroMode() {
           mode: variables.mode,
           customWorkMinutes:
             variables.mode === 'custom'
-              ? (variables.customWorkMinutes ?? previous.customWorkMinutes ?? 25)
+              ? (variables.customWorkMinutes !== undefined && variables.customWorkMinutes !== null ? variables.customWorkMinutes : previous.customWorkMinutes ?? 25)
               : previous.customWorkMinutes,
           customBreakMinutes:
             variables.mode === 'custom'
-              ? (variables.customBreakMinutes ?? previous.customBreakMinutes ?? 5)
+              ? (variables.customBreakMinutes !== undefined && variables.customBreakMinutes !== null ? variables.customBreakMinutes : previous.customBreakMinutes ?? 5)
               : previous.customBreakMinutes,
         });
       }
