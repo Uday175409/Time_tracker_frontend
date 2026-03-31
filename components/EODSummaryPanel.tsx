@@ -15,6 +15,7 @@ import {
   Sparkles,
   CheckCircle,
 } from 'lucide-react';
+import { getErrorMessage } from '@/lib/api';
 
 interface EODSummaryPanelProps {
   userId: string;
@@ -51,7 +52,12 @@ export function EODSummaryPanel({ userId, date }: EODSummaryPanelProps) {
   const handleSave = useCallback(() => {
     updateMutation.mutate(
       { userId, date, summary, highlights, blockers },
-      { onSuccess: () => setIsDirty(false) }
+      {
+        onSuccess: () => setIsDirty(false),
+        onError: (error) => {
+          alert(getErrorMessage(error, 'Failed to save EOD summary'));
+        },
+      }
     );
   }, [userId, date, summary, highlights, blockers, updateMutation]);
 

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCategories, useAddCategory, useDeleteCategory, Category } from '@/hooks/useCategories';
 import { Plus, X, Trash2, Tag } from 'lucide-react';
+import { getErrorMessage } from '@/lib/api';
 
 const AVAILABLE_TAGS = [
     'Development', 'Meetings', 'Bug Fixes', 'Code Review',
@@ -71,7 +72,12 @@ export function CategoryGrid({ userId, onStart, activeCategory, isLoading }: Cat
 
     const handleDelete = (cat: Category) => {
         if (!confirm(`Delete "${cat.name}"? Existing time entries won't be affected.`)) return;
-        deleteMutation.mutate({ categoryId: cat._id, userId });
+        deleteMutation.mutate(
+            { categoryId: cat._id, userId },
+            {
+                onError: (err) => alert(getErrorMessage(err, 'Failed to delete category')),
+            }
+        );
     };
 
     if (catsLoading) {

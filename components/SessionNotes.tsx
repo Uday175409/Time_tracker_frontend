@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNotes, useCreateNote, useUpdateNote, useDeleteNote, WorkNote } from '@/hooks/useNotes';
 import { MessageSquarePlus, Save, Pencil, Trash2, Clock } from 'lucide-react';
+import { getErrorMessage } from '@/lib/api';
 
 interface SessionNotesProps {
   userId: string;
@@ -32,7 +33,10 @@ export function SessionNotes({ userId, sessionId, category }: SessionNotesProps)
     if (!newNote.trim()) return;
     createMutation.mutate(
       { userId, linkedType: 'SESSION', referenceId: sessionId, content: newNote.trim() },
-      { onSuccess: () => setNewNote('') }
+      {
+        onSuccess: () => setNewNote(''),
+        onError: (err) => alert(getErrorMessage(err, 'Failed to create note')),
+      }
     );
   };
 
@@ -40,12 +44,20 @@ export function SessionNotes({ userId, sessionId, category }: SessionNotesProps)
     if (!editContent.trim()) return;
     updateMutation.mutate(
       { noteId, userId, content: editContent.trim() },
-      { onSuccess: () => { setEditingId(null); setEditContent(''); } }
+      {
+        onSuccess: () => { setEditingId(null); setEditContent(''); },
+        onError: (err) => alert(getErrorMessage(err, 'Failed to update note')),
+      }
     );
   };
 
   const handleDelete = (noteId: string) => {
-    deleteMutation.mutate({ noteId, userId });
+    deleteMutation.mutate(
+      { noteId, userId },
+      {
+        onError: (err) => alert(getErrorMessage(err, 'Failed to delete note')),
+      }
+    );
   };
 
   const startEditing = (note: WorkNote) => {

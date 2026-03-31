@@ -22,6 +22,7 @@ import {
   Wand2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getErrorMessage } from '@/lib/api';
 
 const typeIcons: Record<string, React.ReactNode> = {
   daily_standup: <CalendarDays size={14} className="text-blue-400" />,
@@ -94,7 +95,12 @@ export function TemplateSelector({ userId, selectedTemplate, onSelect }: Templat
 
   const handleDelete = (templateId: string) => {
     if (!confirm('Delete this template?')) return;
-    deleteMut.mutate({ templateId, userId });
+    deleteMut.mutate(
+      { templateId, userId },
+      {
+        onError: (err) => alert(getErrorMessage(err, 'Failed to delete template')),
+      }
+    );
   };
 
   if (isLoading) return <div className="text-xs text-gray-500">Loading templates...</div>;

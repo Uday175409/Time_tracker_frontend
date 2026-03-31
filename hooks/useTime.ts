@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { throwApiError } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -18,7 +19,7 @@ type TodayData = {
 
 async function fetchToday(userId: string): Promise<TodayData> {
     const res = await fetch(`${API_URL}/api/track/today?userId=${userId}`);
-    if (!res.ok) throw new Error('Failed to fetch today data');
+    if (!res.ok) await throwApiError(res, 'Failed to fetch today data');
     return res.json();
 }
 
@@ -28,7 +29,7 @@ async function startTracking({ userId, category, description }: { userId: string
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, category, description }),
     });
-    if (!res.ok) throw new Error('Failed to start tracking');
+    if (!res.ok) await throwApiError(res, 'Failed to start tracking');
     return res.json();
 }
 
@@ -38,7 +39,7 @@ async function stopTracking(userId: string) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
     });
-    if (!res.ok) throw new Error('Failed to stop tracking');
+    if (!res.ok) await throwApiError(res, 'Failed to stop tracking');
     return res.json();
 }
 

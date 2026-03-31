@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { throwApiError } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -21,7 +22,7 @@ export type PomodoroSession = {
 
 async function fetchPomodoroToday(userId: string): Promise<PomodoroSession> {
   const res = await fetch(`${API_URL}/api/pomodoro/today?userId=${userId}`);
-  if (!res.ok) throw new Error('Failed to fetch pomodoro session');
+  if (!res.ok) await throwApiError(res, 'Failed to fetch pomodoro session');
   const json = await res.json();
   return json.session;
 }
@@ -32,7 +33,7 @@ async function startWorkApi(data: { userId: string; category: string }) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Failed to start work pomodoro');
+  if (!res.ok) await throwApiError(res, 'Failed to start work pomodoro');
   return res.json();
 }
 
@@ -42,7 +43,7 @@ async function completeWork(data: { userId: string; category: string }) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Failed to complete pomodoro');
+  if (!res.ok) await throwApiError(res, 'Failed to complete pomodoro');
   return res.json();
 }
 
@@ -52,7 +53,7 @@ async function completeBreak(userId: string) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId }),
   });
-  if (!res.ok) throw new Error('Failed to complete break');
+  if (!res.ok) await throwApiError(res, 'Failed to complete break');
   return res.json();
 }
 
@@ -62,7 +63,7 @@ async function cancelPomodoroApi(userId: string) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId }),
   });
-  if (!res.ok) throw new Error('Failed to cancel pomodoro');
+  if (!res.ok) await throwApiError(res, 'Failed to cancel pomodoro');
   return res.json();
 }
 
@@ -72,7 +73,7 @@ async function pausePomodoroApi(userId: string) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId }),
   });
-  if (!res.ok) throw new Error('Failed to pause pomodoro');
+  if (!res.ok) await throwApiError(res, 'Failed to pause pomodoro');
   return res.json();
 }
 
@@ -82,7 +83,7 @@ async function resumePomodoroApi(userId: string) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId }),
   });
-  if (!res.ok) throw new Error('Failed to resume pomodoro');
+  if (!res.ok) await throwApiError(res, 'Failed to resume pomodoro');
   return res.json();
 }
 
@@ -97,7 +98,7 @@ async function setMode(data: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Failed to set mode');
+  if (!res.ok) await throwApiError(res, 'Failed to set mode');
   return res.json();
 }
 

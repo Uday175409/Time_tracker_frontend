@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { throwApiError } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -25,7 +26,7 @@ async function fetchNotes(
 ): Promise<WorkNote[]> {
   const params = new URLSearchParams({ userId, linkedType, referenceId });
   const res = await fetch(`${API_URL}/api/notes?${params}`);
-  if (!res.ok) throw new Error('Failed to fetch notes');
+  if (!res.ok) await throwApiError(res, 'Failed to fetch notes');
   const json = await res.json();
   return json.notes;
 }
@@ -41,7 +42,7 @@ async function createNote(data: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error('Failed to create note');
+  if (!res.ok) await throwApiError(res, 'Failed to create note');
   return res.json();
 }
 
@@ -51,7 +52,7 @@ async function updateNote(data: { noteId: string; userId: string; content: strin
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId: data.userId, content: data.content }),
   });
-  if (!res.ok) throw new Error('Failed to update note');
+  if (!res.ok) await throwApiError(res, 'Failed to update note');
   return res.json();
 }
 
@@ -59,7 +60,7 @@ async function deleteNote(noteId: string, userId: string) {
   const res = await fetch(`${API_URL}/api/notes/${noteId}?userId=${userId}`, {
     method: 'DELETE',
   });
-  if (!res.ok) throw new Error('Failed to delete note');
+  if (!res.ok) await throwApiError(res, 'Failed to delete note');
   return res.json();
 }
 

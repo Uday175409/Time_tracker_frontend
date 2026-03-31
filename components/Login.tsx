@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { getErrorMessage, throwApiError } from '@/lib/api';
 
 interface LoginProps {
     onLogin: (user: { id: string; name: string }) => void;
@@ -30,6 +31,9 @@ export function Login({ onLogin }: LoginProps) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: name.trim(), password }),
             });
+            if (!res.ok) {
+                await throwApiError(res, 'Login failed');
+            }
             const data = await res.json();
             if (data.success) {
                 onLogin(data.user);
@@ -37,7 +41,7 @@ export function Login({ onLogin }: LoginProps) {
                 alert(data.message || 'Login failed');
             }
         } catch (e) {
-            alert('Login error');
+            alert(getErrorMessage(e, 'Login failed'));
         } finally {
             setLoading(false);
         }

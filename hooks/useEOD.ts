@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { throwApiError } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -28,7 +29,7 @@ export type EODSummary = {
 
 async function fetchEOD(userId: string, date: string): Promise<EODSummary> {
   const res = await fetch(`${API_URL}/api/eod/${date}?userId=${userId}`);
-  if (!res.ok) throw new Error('Failed to fetch EOD summary');
+  if (!res.ok) await throwApiError(res, 'Failed to fetch EOD summary');
   const json = await res.json();
   return json.eod;
 }
@@ -46,7 +47,7 @@ async function updateEOD(data: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error('Failed to update EOD summary');
+  if (!res.ok) await throwApiError(res, 'Failed to update EOD summary');
   return res.json();
 }
 

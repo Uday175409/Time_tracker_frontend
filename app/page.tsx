@@ -15,6 +15,7 @@ import { PomodoroTimer } from '@/components/PomodoroTimer';
 import type { PomodoroPhase } from '@/components/PomodoroTimer';
 import { useCategories, Category } from '@/hooks/useCategories';
 import { TimeDistributionChart } from '@/components/TimeDistributionChart';
+import { getErrorMessage } from '@/lib/api';
 
 export default function Home() {
   const [user, setUser] = useState<{ id: string; name: string } | null>(null);
@@ -68,7 +69,14 @@ function Dashboard({ user, onLogout }: { user: { id: string; name: string }, onL
       return;
     }
     const desc = prompt(`What are you working on in ${category}?`);
-    startMutation.mutate({ userId: user.id, category, description: desc || '' });
+    startMutation.mutate(
+      { userId: user.id, category, description: desc || '' },
+      {
+        onError: (error) => {
+          alert(getErrorMessage(error, 'Unable to start tracking'));
+        },
+      }
+    );
   };
 
     return (
@@ -112,7 +120,11 @@ function Dashboard({ user, onLogout }: { user: { id: string; name: string }, onL
                     alert('A Pomodoro is currently active. Cancel or finish it first.');
                     return;
                   }
-                  stopMutation.mutate(user.id);
+                  stopMutation.mutate(user.id, {
+                    onError: (error) => {
+                      alert(getErrorMessage(error, 'Unable to stop tracking'));
+                    },
+                  });
                 }}
                 isLoading={stopMutation.isPending}
               />

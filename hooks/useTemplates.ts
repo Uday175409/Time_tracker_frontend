@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { throwApiError } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -23,14 +24,14 @@ export type ReportTemplate = {
 
 async function fetchTemplates(userId: string): Promise<ReportTemplate[]> {
   const res = await fetch(`${API_URL}/api/templates?userId=${userId}`);
-  if (!res.ok) throw new Error('Failed to fetch templates');
+  if (!res.ok) await throwApiError(res, 'Failed to fetch templates');
   const json = await res.json();
   return json.templates;
 }
 
 async function fetchTemplate(templateId: string, userId: string): Promise<ReportTemplate> {
   const res = await fetch(`${API_URL}/api/templates/${templateId}?userId=${userId}`);
-  if (!res.ok) throw new Error('Failed to fetch template');
+  if (!res.ok) await throwApiError(res, 'Failed to fetch template');
   const json = await res.json();
   return json.template;
 }
@@ -45,10 +46,7 @@ async function createTemplate(data: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) {
-    const json = await res.json();
-    throw new Error(json.message || 'Failed to create template');
-  }
+  if (!res.ok) await throwApiError(res, 'Failed to create template');
   return res.json();
 }
 
@@ -64,7 +62,7 @@ async function updateTemplate(data: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error('Failed to update template');
+  if (!res.ok) await throwApiError(res, 'Failed to update template');
   return res.json();
 }
 
@@ -72,10 +70,7 @@ async function deleteTemplate(templateId: string, userId: string) {
   const res = await fetch(`${API_URL}/api/templates/${templateId}?userId=${userId}`, {
     method: 'DELETE',
   });
-  if (!res.ok) {
-    const json = await res.json();
-    throw new Error(json.message || 'Failed to delete template');
-  }
+  if (!res.ok) await throwApiError(res, 'Failed to delete template');
   return res.json();
 }
 

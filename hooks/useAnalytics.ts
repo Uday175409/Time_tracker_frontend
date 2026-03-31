@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
+import { throwApiError } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 async function fetchAnalytics(userId: string, range: 'day' | 'week' | 'month') {
     const res = await fetch(`${API_URL}/api/analytics/productivity?userId=${userId}&range=${range}`);
-    if (!res.ok) throw new Error('Failed to fetch analytics');
+    if (!res.ok) await throwApiError(res, 'Failed to fetch analytics');
     const json = await res.json();
     return json.data;
 }
@@ -31,7 +32,7 @@ export type TrendPoint = {
 
 async function fetchTrend(userId: string, days: number): Promise<TrendPoint[]> {
     const res = await fetch(`${API_URL}/api/analytics/trend?userId=${userId}&days=${days}`);
-    if (!res.ok) throw new Error('Failed to fetch trend');
+    if (!res.ok) await throwApiError(res, 'Failed to fetch trend');
     const json = await res.json();
     return json.data;
 }
@@ -56,7 +57,7 @@ export type WeeklyCategoryPoint = {
 
 async function fetchWeeklyCategories(userId: string, weeks: number): Promise<WeeklyCategoryPoint[]> {
     const res = await fetch(`${API_URL}/api/analytics/weekly-categories?userId=${userId}&weeks=${weeks}`);
-    if (!res.ok) throw new Error('Failed to fetch weekly categories');
+    if (!res.ok) await throwApiError(res, 'Failed to fetch weekly categories');
     const json = await res.json();
     return json.data;
 }
@@ -80,7 +81,7 @@ export type HeatmapPoint = {
 
 async function fetchHeatmap(userId: string, days: number): Promise<HeatmapPoint[]> {
     const res = await fetch(`${API_URL}/api/analytics/heatmap?userId=${userId}&days=${days}`);
-    if (!res.ok) throw new Error('Failed to fetch heatmap');
+    if (!res.ok) await throwApiError(res, 'Failed to fetch heatmap');
     const json = await res.json();
     return json.data;
 }
@@ -110,7 +111,7 @@ export type Insights = {
 
 async function fetchInsights(userId: string): Promise<Insights> {
     const res = await fetch(`${API_URL}/api/analytics/insights?userId=${userId}`);
-    if (!res.ok) throw new Error('Failed to fetch insights');
+    if (!res.ok) await throwApiError(res, 'Failed to fetch insights');
     const json = await res.json();
     return json.data;
 }

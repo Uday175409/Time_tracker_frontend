@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { throwApiError } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -14,7 +15,7 @@ export type Category = {
 
 async function fetchCategories(userId: string): Promise<Category[]> {
   const res = await fetch(`${API_URL}/api/categories?userId=${userId}`);
-  if (!res.ok) throw new Error('Failed to fetch categories');
+  if (!res.ok) await throwApiError(res, 'Failed to fetch categories');
   const json = await res.json();
   return json.categories;
 }
@@ -31,10 +32,7 @@ async function addCategory(data: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) {
-    const json = await res.json();
-    throw new Error(json.message || 'Failed to add category');
-  }
+  if (!res.ok) await throwApiError(res, 'Failed to add category');
   return res.json();
 }
 
@@ -42,7 +40,7 @@ async function deleteCategory(categoryId: string, userId: string) {
   const res = await fetch(`${API_URL}/api/categories/${categoryId}?userId=${userId}`, {
     method: 'DELETE',
   });
-  if (!res.ok) throw new Error('Failed to delete category');
+  if (!res.ok) await throwApiError(res, 'Failed to delete category');
   return res.json();
 }
 
