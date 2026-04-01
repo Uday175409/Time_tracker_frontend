@@ -16,6 +16,7 @@ import type { PomodoroPhase } from '@/components/PomodoroTimer';
 import { useCategories, Category } from '@/hooks/useCategories';
 import { TimeDistributionChart } from '@/components/TimeDistributionChart';
 import { getErrorMessage } from '@/lib/api';
+import { ManualEntryForm } from '@/components/ManualEntryForm';
 
 export default function Home() {
   const [user, setUser] = useState<{ id: string; name: string } | null>(null);
@@ -134,6 +135,8 @@ function Dashboard({ user, onLogout }: { user: { id: string; name: string }, onL
                 activeCategory={today?.runningEntry?.category}
                 isLoading={startMutation.isPending || pomodoroActive}
               />
+
+              <ManualEntryForm userId={user.id} />
   
               {/* Pomodoro Timer */}
               <PomodoroTimer
