@@ -25,6 +25,11 @@ export type EODSummary = {
   updatedAt: string;
 };
 
+export type CurrentEODResponse = {
+  date: string;
+  eod: EODSummary;
+};
+
 // --- Fetch helpers ---
 
 async function fetchEOD(userId: string, date: string): Promise<EODSummary> {
@@ -32,6 +37,12 @@ async function fetchEOD(userId: string, date: string): Promise<EODSummary> {
   if (!res.ok) await throwApiError(res, 'Failed to fetch EOD summary');
   const json = await res.json();
   return json.eod;
+}
+
+async function fetchCurrentEOD(userId: string): Promise<CurrentEODResponse> {
+  const res = await fetch(`${API_URL}/api/eod/current?userId=${userId}`);
+  if (!res.ok) await throwApiError(res, 'Failed to fetch current EOD summary');
+  return res.json();
 }
 
 async function updateEOD(data: {
@@ -62,6 +73,15 @@ export function useEOD(userId: string | undefined, date: string | undefined) {
     queryKey: ['eod', userId, date],
     queryFn: () => fetchEOD(userId!, date!),
     enabled: !!userId && !!date,
+  });
+}
+
+/** Fetch the canonical current-date EOD summary from the server. */
+export function useCurrentEOD(userId: string | undefined) {
+  return useQuery({
+    queryKey: ['eod', userId, 'current'],
+    queryFn: () => fetchCurrentEOD(userId!),
+    enabled: !!userId,
   });
 }
 

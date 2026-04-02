@@ -9,6 +9,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { TemplateSelector } from '@/components/TemplateSelector';
 import { TemplateReportPanel } from '@/components/TemplateReportPanel';
 import { ReportTemplate } from '@/hooks/useTemplates';
+import { useCurrentEOD } from '@/hooks/useEOD';
 
 /**
  * Dedicated EOD page. Users can browse daily summaries by date,
@@ -17,25 +18,37 @@ import { ReportTemplate } from '@/hooks/useTemplates';
  */
 export default function EODPage() {
   const [user, setUser] = useState<{ id: string; name: string } | null>(null);
-  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<ReportTemplate | null>(null);
+  const { data: currentEOD } = useCurrentEOD(user?.id);
 
   useEffect(() => {
     const saved = localStorage.getItem('user');
     if (saved) setUser(JSON.parse(saved));
   }, []);
 
+  useEffect(() => {
+    if (!date && currentEOD?.date) {
+      setDate(currentEOD.date);
+    }
+  }, [currentEOD, date]);
+
   if (!user) return <div className="p-8 text-gray-400">Please login first</div>;
+  if (!date) return <div className="p-8 text-gray-400">Loading current date...</div>;
 
   const changeDate = (days: number) => {
-    const d = new Date(date);
+    const d = new Date(`${date}T00:00:00`);
     d.setDate(d.getDate() + days);
-    // Don't allow going into the future
-    if (d > new Date()) return;
-    setDate(d.toISOString().split('T')[0]);
+    const nextDate = d.toISOString().split('T')[0];
+    const currentDate = currentEOD?.date;
+
+    // Don't allow going into the future beyond the server canonical date.
+    if (currentDate && nextDate > currentDate) return;
+
+    setDate(nextDate);
   };
 
-  const isToday = date === new Date().toISOString().split('T')[0];
+  const isToday = date === currentEOD?.date;
 
   return (
     <main className="min-h-screen p-4 md:p-8 bg-[#020617] text-gray-100 dark relative overflow-hidden font-sans">
