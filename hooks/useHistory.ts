@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { throwApiError } from '@/lib/api';
+import { getApiUrl, throwApiError } from '@/lib/api';
 import type { TimeEntry } from './useTime';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = getApiUrl();
 
 export type HistoryDay = {
     date: string;

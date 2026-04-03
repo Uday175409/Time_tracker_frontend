@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { throwApiError } from '@/lib/api';
+import { getApiUrl, throwApiError } from '@/lib/api';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = getApiUrl();
 
 async function fetchAnalytics(userId: string, range: 'day' | 'week' | 'month') {
     const res = await fetch(`${API_URL}/api/analytics/productivity?userId=${userId}&range=${range}`);

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { throwApiError } from '@/lib/api';
+import { getApiUrl, throwApiError } from '@/lib/api';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = getApiUrl();
 
 export type Category = {
   _id: string;

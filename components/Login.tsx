@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getErrorMessage, throwApiError } from '@/lib/api';
+import { getApiUrl, getErrorMessage, throwApiError } from '@/lib/api';
 
 interface LoginProps {
     onLogin: (user: { id: string; name: string }) => void;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = getApiUrl();
 
 export function Login({ onLogin }: LoginProps) {
     const [name, setName] = useState('');
